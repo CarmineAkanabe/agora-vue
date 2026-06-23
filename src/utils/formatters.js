@@ -1,4 +1,4 @@
-import dayjs from 'dayjs'
+﻿import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import localizedFormat from 'dayjs/plugin/localizedFormat'
 
@@ -6,7 +6,7 @@ dayjs.extend(relativeTime)
 dayjs.extend(localizedFormat)
 
 // ============================================================
-// Agora — Formatters
+// Agora - Formatters
 // Pure functions. No side effects. No imports from stores.
 // Use these everywhere dates, numbers, and currency appear.
 // ============================================================
@@ -22,7 +22,7 @@ dayjs.extend(localizedFormat)
  * @returns {string} e.g. "150 000 XAF"
  */
 export const formatPrice = (amount) => {
-  if (amount === null || amount === undefined) return '—'
+  if (amount === null || amount === undefined) return '-'
 
   return new Intl.NumberFormat('fr-CM', {
     style: 'currency',
@@ -39,7 +39,7 @@ export const formatPrice = (amount) => {
  * @returns {string} e.g. "150 000"
  */
 export const formatAmount = (amount) => {
-  if (amount === null || amount === undefined) return '—'
+  if (amount === null || amount === undefined) return '-'
 
   return new Intl.NumberFormat('fr-CM').format(Number(amount))
 }
@@ -54,7 +54,7 @@ export const formatAmount = (amount) => {
  * @returns {string} e.g. "January 15, 2025 at 10:30 AM"
  */
 export const formatDate = (date) => {
-  if (!date) return '—'
+  if (!date) return '-'
   return dayjs(date).format('MMMM D, YYYY [at] h:mm A')
 }
 
@@ -64,7 +64,7 @@ export const formatDate = (date) => {
  * @returns {string} e.g. "Jan 15, 2025"
  */
 export const formatDateShort = (date) => {
-  if (!date) return '—'
+  if (!date) return '-'
   return dayjs(date).format('MMM D, YYYY')
 }
 
@@ -74,7 +74,7 @@ export const formatDateShort = (date) => {
  * @returns {string} e.g. "2 hours ago" or "in 3 days"
  */
 export const formatRelative = (date) => {
-  if (!date) return '—'
+  if (!date) return '-'
   return dayjs(date).fromNow()
 }
 
@@ -85,14 +85,14 @@ export const formatRelative = (date) => {
  * @returns {string}
  */
 export const formatNotificationDate = (date) => {
-  if (!date) return '—'
+  if (!date) return '-'
   const d = dayjs(date)
   const diffDays = dayjs().diff(d, 'day')
   return diffDays < 7 ? d.fromNow() : d.format('MMM D, YYYY')
 }
 
 /**
- * Format a countdown — time remaining until a future date.
+ * Format a countdown - time remaining until a future date.
  * Used for the 2-hour payment window on approved requests.
  * Returns null if the date is in the past.
  * @param {string|Date} date
@@ -132,10 +132,10 @@ export const isPast = (date) => {
 /**
  * Format a rating number to one decimal place.
  * @param {number|string|null} rating
- * @returns {string} e.g. "4.8" or "—"
+ * @returns {string} e.g. "4.8" or "-"
  */
 export const formatRating = (rating) => {
-  if (rating === null || rating === undefined) return '—'
+  if (rating === null || rating === undefined) return '-'
   return Number(rating).toFixed(1)
 }
 
@@ -162,7 +162,7 @@ export const ratingToStars = (rating) => {
  */
 export const truncate = (text, max = 100) => {
   if (!text) return ''
-  return text.length > max ? text.slice(0, max).trimEnd() + '…' : text
+  return text.length > max ? text.slice(0, max).trimEnd() + '...' : text
 }
 
 /**
@@ -179,7 +179,7 @@ export const capitalize = (text) => {
  * Generate initials from a full name (up to 2 letters).
  * Used in Avatar.vue when no profile picture is set.
  * @param {string} name
- * @returns {string} e.g. "Alice Mboua" → "AM"
+ * @returns {string} e.g. "Alice Mboua" â†’ "AM"
  */
 export const getInitials = (name) => {
   if (!name) return '?'
@@ -219,9 +219,10 @@ export const isValidImage = (file) => {
 /**
  * Check if a file exceeds a size limit.
  * @param {File} file
- * @param {number} maxMB — max size in megabytes
+ * @param {number} maxMB - max size in megabytes
  * @returns {boolean}
  */
 export const exceedsSize = (file, maxMB = 2) => {
   return file?.size > maxMB * 1024 * 1024
 }
+
