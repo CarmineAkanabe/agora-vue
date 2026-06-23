@@ -165,9 +165,12 @@ const confirmClass = computed(() => {
   transition: opacity var(--transition-base);
 }
 
-.modal-enter-active .modal,
+.modal-enter-active .modal {
+  transition: transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity var(--transition-base);
+}
+
 .modal-leave-active .modal {
-  transition: transform var(--transition-base), opacity var(--transition-base);
+  transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1), opacity var(--transition-base);
 }
 
 .modal-enter-from,
@@ -176,11 +179,11 @@ const confirmClass = computed(() => {
 }
 
 .modal-enter-from .modal {
-  transform: translateY(-16px) scale(0.98);
+  transform: translateY(20px) scale(0.95);
 }
 
 .modal-leave-to .modal {
-  transform: translateY(8px) scale(0.98);
+  transform: translateY(20px) scale(0.95);
 }
 
 .btn-spinner {

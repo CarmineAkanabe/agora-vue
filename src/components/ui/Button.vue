@@ -101,4 +101,8 @@ const classes = computed(() => [
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+.btn:active:not(.btn-disabled):not(.btn-loading) {
+  transform: scale(0.97);
+}
 </style>

@@ -1,5 +1,5 @@
 <script setup>
-// import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
 import { onMounted } from 'vue'
 import { useAuthStore } from '@/stores/useAuthStore'
 
@@ -12,9 +12,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div>
-
-  </div>
+  <RouterView />
 </template>
 
 <style scoped>

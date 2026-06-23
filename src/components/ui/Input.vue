@@ -83,6 +83,11 @@ const inputId = computed(() => props.id ?? `input-${Math.random().toString(36).s
   display: flex;
   flex-direction: column;
   gap: var(--spacing-1);
+  transition: all var(--transition-fast);
+}
+
+.input-wrapper:focus-within .label {
+  color: var(--color-primary);
 }
 
 .input-required {
@@ -113,5 +118,13 @@ const inputId = computed(() => props.id ?? `input-${Math.random().toString(36).s
 .input-hint {
   font-size: var(--font-size-xs);
   color: var(--color-text-3);
+}
+
+.input:hover:not(:disabled):not(.input-error) {
+  border-color: var(--color-text-3);
+}
+
+.label {
+  transition: color var(--transition-fast);
 }
 </style>
