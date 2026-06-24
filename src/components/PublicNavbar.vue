@@ -3,7 +3,7 @@
     <div class="container navbar-inner">
       <!-- Logo -->
       <router-link :to="{ name: 'home' }" class="navbar-logo">
-        <span class="logo-text">Agora</span>
+        <img src="/agora-logo.svg" alt="Agora" class="logo-img" />
       </router-link>
 
       <!-- Desktop nav links -->
@@ -129,6 +129,12 @@ watch(
   align-items: center;
 }
 
+.logo-img {
+  width: 136px;
+  height: 40px;
+  object-fit: contain;
+}
+
 .logo-text {
   font-family: var(--font-display);
   font-size: var(--font-size-xl);
@@ -239,3 +245,4 @@ watch(
   }
 }
 </style>
+

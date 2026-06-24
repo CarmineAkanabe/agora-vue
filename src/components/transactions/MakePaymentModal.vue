@@ -8,34 +8,42 @@
     :loading="loading"
     @confirm="submit"
   >
-    <form class="space-y-4" @submit.prevent="submit">
-      <p class="text-text-2 text-sm">
-        You are about to make a payment for <strong class="text-text-1">{{ request.listing?.title }}</strong>.
-        The amount is {{ formatPrice(request.listing?.price) }}.
-      </p>
-      
-      <div class="input-wrapper">
-        <label for="payment_method" class="label">Payment Provider</label>
-        <select 
-          id="payment_method" 
-          v-model="form.payment_method" 
-          class="input bg-surface-2 border-border text-text-1 w-full p-2 rounded" 
-          required
-        >
-          <option value="" disabled>Select Provider</option>
-          <option value="mtn">MTN Mobile Money</option>
-          <option value="orange">Orange Money</option>
-        </select>
-        <span v-if="errors.payment_method" class="error-message text-danger text-xs">{{ errors.payment_method[0] }}</span>
+    <form class="payment-form" @submit.prevent="submit">
+      <div class="payment-summary">
+        <span class="summary-label">Escrow payment</span>
+        <strong>{{ formatPrice(request.listing?.price) }}</strong>
+        <p>
+          Payment for <span>{{ request.listing?.title }}</span> will be held securely until pickup is confirmed.
+        </p>
       </div>
 
-      <div v-if="Object.keys(errors).length > 0" class="p-3 bg-danger-ghost border border-danger/30 rounded-lg text-danger text-sm mt-2">
+      <div class="input-wrapper">
+        <label class="label">Payment Provider</label>
+        <div class="provider-grid" role="radiogroup" aria-label="Payment Provider">
+          <button
+            v-for="provider in providers"
+            :key="provider.value"
+            type="button"
+            :class="['provider-option', { active: form.payment_method === provider.value }]"
+            role="radio"
+            :aria-checked="form.payment_method === provider.value"
+            @click="form.payment_method = provider.value"
+          >
+            <img :src="provider.logo" :alt="provider.name" />
+            <span>{{ provider.name }}</span>
+          </button>
+        </div>
+        <span v-if="errors.payment_method" class="error-message text-danger text-xs">
+          {{ errors.payment_method[0] }}
+        </span>
+      </div>
+
+      <div v-if="Object.keys(errors).length > 0" class="payment-errors">
         <p v-for="(errMsgs, key) in errors" :key="key">
           <strong>{{ key }}:</strong> {{ Array.isArray(errMsgs) ? errMsgs[0] : errMsgs }}
         </p>
       </div>
-      
-      <!-- Hidden submit button to allow Enter key submission -->
+
       <button type="submit" class="hidden"></button>
     </form>
   </Modal>
@@ -52,15 +60,27 @@ import { toast } from 'vue-sonner'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
-  request: { type: Object, required: true }
+  request: { type: Object, required: true },
 })
 
 const emit = defineEmits(['update:modelValue', 'success'])
 
+const providers = [
+  { value: 'mtn', name: 'MTN Mobile Money', logo: '/mtn-momo.svg' },
+  { value: 'orange', name: 'Orange Money', logo: '/orange-money.svg' },
+]
+
 const isOpen = ref(props.modelValue)
 
-watch(() => props.modelValue, (val) => { isOpen.value = val })
-watch(isOpen, (val) => { emit('update:modelValue', val) })
+watch(
+  () => props.modelValue,
+  (val) => {
+    isOpen.value = val
+  },
+)
+watch(isOpen, (val) => {
+  emit('update:modelValue', val)
+})
 
 const transactionStore = useTransactionStore()
 const authStore = useAuthStore()
@@ -80,38 +100,40 @@ const submit = async () => {
 
   loading.value = true
   errors.value = {}
-  
+
   try {
     const tx = await transactionStore.initiatePayment({
       purchase_request_id: props.request.id,
       payment_method: form.payment_method,
-      buyer_phone: authStore.user?.profile?.phone || ''
+      buyer_phone: authStore.user?.profile?.phone || '',
     })
-    
-    // Some APIs wrap the object in 'transaction' or 'data'
+
     const txId = tx?.id || tx?.transaction?.id || tx?.data?.id
-    
+
     isOpen.value = false
     emit('success', tx)
     toast.success('Payment initiated!')
-    
+
     if (txId) {
       router.push({ name: 'transaction-detail', params: { id: txId } })
     } else {
-      router.push({ name: 'transactions' }) // Fallback
+      router.push({ name: 'transactions' })
     }
   } catch (error) {
-    console.error("Payment Submission Error:", error)
+    console.error('Payment Submission Error:', error)
     if (error.response?.status === 422) {
       errors.value = error.response.data.errors || {}
     } else {
       isOpen.value = false
-      router.push({ 
-        name: 'error', 
-        query: { 
+      router.push({
+        name: 'error',
+        query: {
           title: 'Payment Failed',
-          message: error.response?.data?.message || error.message || 'An unexpected error occurred while initiating your payment.' 
-        } 
+          message:
+            error.response?.data?.message ||
+            error.message ||
+            'An unexpected error occurred while initiating your payment.',
+        },
       })
     }
   } finally {
@@ -119,3 +141,100 @@ const submit = async () => {
   }
 }
 </script>
+
+<style scoped>
+.payment-form {
+  display: grid;
+  gap: var(--spacing-5);
+}
+
+.payment-summary {
+  padding: var(--spacing-5);
+  border: 1px solid rgba(45, 212, 191, 0.2);
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, rgba(45, 212, 191, 0.1), rgba(251, 191, 36, 0.07));
+}
+
+.summary-label {
+  display: block;
+  margin-bottom: var(--spacing-2);
+  color: var(--color-text-3);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.payment-summary strong {
+  display: block;
+  color: var(--color-accent);
+  font-family: var(--font-display);
+  font-size: var(--font-size-2xl);
+}
+
+.payment-summary p {
+  margin-top: var(--spacing-2);
+  font-size: var(--font-size-sm);
+}
+
+.payment-summary span {
+  color: var(--color-text-1);
+  font-weight: var(--font-weight-semibold);
+}
+
+.provider-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacing-3);
+}
+
+.provider-option {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  min-height: 76px;
+  padding: var(--spacing-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-3);
+  color: var(--color-text-2);
+  cursor: pointer;
+  text-align: left;
+  transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.provider-option:hover,
+.provider-option.active {
+  transform: translateY(-2px);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-glow-primary);
+  color: var(--color-text-1);
+}
+
+.provider-option img {
+  width: 56px;
+  height: 36px;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+}
+
+.provider-option span {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.payment-errors {
+  padding: var(--spacing-3);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-md);
+  background: var(--color-danger-ghost);
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+}
+
+@media (max-width: 520px) {
+  .provider-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>

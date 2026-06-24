@@ -6,7 +6,7 @@
         :to="auth.isAdmin ? { name: 'admin-dashboard' } : { name: 'dashboard' }"
         class="navbar-logo"
       >
-        <span class="logo-text">Agora</span>
+        <img src="/agora-logo.svg" alt="Agora" class="logo-img" />
       </router-link>
 
       <!-- Desktop nav — student only -->
@@ -186,6 +186,12 @@ watch(
   flex-shrink: 0;
 }
 
+.logo-img {
+  width: 136px;
+  height: 40px;
+  object-fit: contain;
+}
+
 .logo-text {
   font-family: var(--font-display);
   font-size: var(--font-size-xl);
@@ -305,3 +311,4 @@ watch(
   }
 }
 </style>
+

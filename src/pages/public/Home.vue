@@ -1,6 +1,6 @@
 <template>
   <section class="container section space-y-8">
-    <div class="glass-card p-8 md:p-10">
+    <div class="glass-card hero-panel p-8 md:p-10">
       <div class="max-w-2xl space-y-4">
         <p class="text-sm uppercase tracking-[0.3em] text-accent">Verified campus marketplace</p>
         <h1 class="text-4xl md:text-5xl font-bold text-text-1">Buy and sell safely on campus.</h1>
@@ -18,7 +18,7 @@
     </div>
 
     <div class="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-      <div class="card space-y-4">
+      <div class="card interactive-surface space-y-4">
         <div class="flex items-center justify-between">
           <h2 class="text-2xl font-semibold">Popular categories</h2>
           <span class="text-sm text-text-3">{{ categories.length }} active</span>
@@ -33,7 +33,7 @@
         </div>
       </div>
 
-      <div class="card space-y-4">
+      <div class="card interactive-surface space-y-4">
         <div class="flex items-center justify-between">
           <h2 class="text-2xl font-semibold">Fresh listings</h2>
           <router-link :to="{ name: 'browse' }" class="text-sm text-primary">View all</router-link>
@@ -45,7 +45,7 @@
           <article
             v-for="listing in listings"
             :key="listing.id"
-            class="rounded-xl border border-border bg-surface-3/70 p-4"
+            class="interactive-surface rounded-xl border border-border bg-surface-3/70 p-4"
           >
             <div class="flex items-start justify-between gap-4">
               <div>
@@ -89,3 +89,4 @@ const categories = computed(() => categoryStore.categories)
 const listings = computed(() => listingStore.listings.slice(0, 4))
 const loading = computed(() => categoryStore.loading || listingStore.loading)
 </script>
+

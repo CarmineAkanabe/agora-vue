@@ -197,23 +197,23 @@ onMounted(() => {
   padding: var(--spacing-5);
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border);
-  background-color: var(--color-surface-3);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent), var(--color-surface-3);
   color: var(--color-text-2);
   text-decoration: none;
   font-weight: var(--font-weight-medium);
   font-size: var(--font-size-sm);
-  transition: all var(--transition-fast);
+  transition: transform var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .quick-link-card svg {
   color: var(--color-primary);
   opacity: 0.8;
-  transition: all var(--transition-fast);
+  transition: transform var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .quick-link-card:hover {
-  background-color: var(--color-surface-3-hover);
-  border-color: var(--color-primary-ghost);
+  background: linear-gradient(135deg, rgba(45, 212, 191, 0.12), rgba(251, 191, 36, 0.08)), var(--color-surface-3);
+  border-color: var(--color-primary);
   color: var(--color-text-1);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
@@ -224,3 +224,4 @@ onMounted(() => {
   transform: scale(1.1);
 }
 </style>
+

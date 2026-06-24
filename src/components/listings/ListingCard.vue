@@ -1,5 +1,5 @@
 <template>
-  <article class="card space-y-3">
+  <article class="card listing-card space-y-3">
     <div class="flex items-start justify-between gap-4">
       <div>
         <h3 class="text-lg font-semibold text-text-1">{{ listing.title }}</h3>
@@ -50,3 +50,14 @@ const displayCondition = computed(() => {
   return value.replace(/_/g, ' ')
 })
 </script>
+
+<style scoped>
+.listing-card {
+  min-height: 220px;
+}
+
+.listing-card h3 {
+  line-height: var(--line-height-snug);
+}
+</style>
+
