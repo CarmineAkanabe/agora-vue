@@ -5,22 +5,26 @@ import { ref, watch } from 'vue'
 // Delays updating a value until the user stops typing.
 // Used in Browse.vue search input to avoid firing an API
 // call on every keystroke.
-//
-// Usage:
-// const { debounced } = useDebounce(searchInput, 400)
-// watch(debounced, () => listingStore.fetchListings())
 // ============================================================
 
 export const useDebounce = (source, delay = 400) => {
-  const debounced = ref(source.value)
+  const debouncedValue = ref(source.value)
   let timer = null
 
-  watch(source, (value) => {
+  const setValue = (value) => {
     clearTimeout(timer)
     timer = setTimeout(() => {
-      debounced.value = value
+      debouncedValue.value = value
     }, delay)
-  })
+  }
 
-  return { debounced }
+  watch(
+    source,
+    (value) => {
+      setValue(value)
+    },
+    { immediate: true },
+  )
+
+  return { debouncedValue, setValue }
 }

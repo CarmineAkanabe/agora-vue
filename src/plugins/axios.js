@@ -12,7 +12,7 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000/api',
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json',
+    Accept: 'application/json',
   },
   withCredentials: false,
 })
@@ -32,7 +32,7 @@ api.interceptors.request.use(
 
     return config
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 )
 
 // ============================================================
@@ -78,7 +78,7 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(error)
-  }
+  },
 )
 
 // ============================================================
@@ -99,6 +99,23 @@ export const multipart = (data) => {
   })
 
   return form
+}
+
+export const extractApiErrors = (
+  error,
+  fallbackMessage = 'Something went wrong. Please try again.',
+) => {
+  const serverErrors = error?.response?.data?.errors
+  if (serverErrors && typeof serverErrors === 'object') {
+    return serverErrors
+  }
+
+  const message = error?.response?.data?.message
+  if (typeof message === 'string' && message.trim()) {
+    return { message }
+  }
+
+  return { message: fallbackMessage }
 }
 
 export default api

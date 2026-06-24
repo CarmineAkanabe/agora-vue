@@ -9,6 +9,12 @@ import { useAuthStore } from '@/stores/useAuthStore'
 // meta.guestOnly        → redirect to /dashboard if logged in
 // ============================================================
 
+const resolveGuestRedirect = (auth) => {
+  if (auth.isAdmin) return { name: 'admin-dashboard' }
+  if (auth.isVerified) return { name: 'dashboard' }
+  return { name: 'pending-verification' }
+}
+
 /**
  * Main navigation guard.
  * Runs before every route change.
@@ -16,10 +22,14 @@ import { useAuthStore } from '@/stores/useAuthStore'
 export const authGuard = (to, from, next) => {
   const auth = useAuthStore()
 
+  if (auth.isBanned && to.name !== 'login' && to.name !== 'register') {
+    return next({ name: 'login' })
+  }
+
   // Guest only routes (login, register)
   // Redirect already logged-in users away
   if (to.meta.guestOnly && auth.isLoggedIn) {
-    return next({ name: 'dashboard' })
+    return next(resolveGuestRedirect(auth))
   }
 
   // Requires authentication

@@ -6,16 +6,12 @@ import { useAuthStore } from '@/stores/useAuthStore'
 const auth = useAuthStore()
 
 onMounted(async () => {
-  await auth.refreshUser()
+  await auth.initialize()
 })
-
 </script>
 
 <template>
   <RouterView />
 </template>
 
-<style scoped>
-
-</style>
-
+<style scoped></style>

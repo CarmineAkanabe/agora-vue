@@ -179,7 +179,7 @@ export const capitalize = (text) => {
  * Generate initials from a full name (up to 2 letters).
  * Used in Avatar.vue when no profile picture is set.
  * @param {string} name
- * @returns {string} e.g. "Alice Mboua" â†’ "AM"
+ * @returns {string} e.g. "Alice Mboua" → "AM"
  */
 export const getInitials = (name) => {
   if (!name) return '?'
@@ -225,4 +225,3 @@ export const isValidImage = (file) => {
 export const exceedsSize = (file, maxMB = 2) => {
   return file?.size > maxMB * 1024 * 1024
 }
-

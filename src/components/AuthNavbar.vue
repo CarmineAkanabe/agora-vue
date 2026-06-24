@@ -1,7 +1,6 @@
 <template>
   <header class="auth-navbar">
     <div class="container navbar-inner">
-
       <!-- Logo -->
       <router-link
         :to="auth.isAdmin ? { name: 'admin-dashboard' } : { name: 'dashboard' }"
@@ -12,24 +11,26 @@
 
       <!-- Desktop nav — student only -->
       <nav v-if="!auth.isAdmin" class="navbar-links">
-        <router-link :to="{ name: 'browse' }"           class="nav-link">Browse</router-link>
-        <router-link :to="{ name: 'my-listings' }"      class="nav-link">My Listings</router-link>
-        <router-link :to="{ name: 'sent-requests' }"    class="nav-link">Requests</router-link>
-        <router-link :to="{ name: 'transactions' }"     class="nav-link">Transactions</router-link>
+        <router-link :to="{ name: 'browse' }" class="nav-link">Browse</router-link>
+        <router-link :to="{ name: 'my-listings' }" class="nav-link">My Listings</router-link>
+        <router-link :to="{ name: 'my-reviews' }" class="nav-link">My Reviews</router-link>
+        <router-link :to="{ name: 'requests' }" class="nav-link">Requests</router-link>
+        <router-link :to="{ name: 'transactions' }" class="nav-link">Transactions</router-link>
       </nav>
 
       <!-- Desktop nav — admin only -->
       <nav v-else class="navbar-links">
-        <router-link :to="{ name: 'admin-verifications' }" class="nav-link">Verifications</router-link>
-        <router-link :to="{ name: 'admin-users' }"         class="nav-link">Users</router-link>
-        <router-link :to="{ name: 'admin-listings' }"      class="nav-link">Listings</router-link>
-        <router-link :to="{ name: 'admin-disputes' }"      class="nav-link">Disputes</router-link>
-        <router-link :to="{ name: 'admin-reports' }"       class="nav-link">Reports</router-link>
+        <router-link :to="{ name: 'admin-verifications' }" class="nav-link"
+          >Verifications</router-link
+        >
+        <router-link :to="{ name: 'admin-users' }" class="nav-link">Users</router-link>
+        <router-link :to="{ name: 'admin-listings' }" class="nav-link">Listings</router-link>
+        <router-link :to="{ name: 'admin-disputes' }" class="nav-link">Disputes</router-link>
+        <router-link :to="{ name: 'admin-categories' }" class="nav-link">Categories</router-link>
       </nav>
 
       <!-- Right side actions -->
       <div class="navbar-actions">
-
         <!-- Create listing button — student only -->
         <Button
           v-if="auth.isVerified && !auth.isAdmin"
@@ -45,57 +46,121 @@
 
         <!-- Profile menu -->
         <ProfileMenu />
-
       </div>
 
       <!-- Mobile toggle -->
       <button class="navbar-mobile-toggle" @click="mobileOpen = !mobileOpen">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line v-if="!mobileOpen" x1="3" y1="6"  x2="21" y2="6"  />
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <line v-if="!mobileOpen" x1="3" y1="6" x2="21" y2="6" />
           <line v-if="!mobileOpen" x1="3" y1="12" x2="21" y2="12" />
           <line v-if="!mobileOpen" x1="3" y1="18" x2="21" y2="18" />
-          <line v-if="mobileOpen"  x1="18" y1="6" x2="6"  y2="18" />
-          <line v-if="mobileOpen"  x1="6"  y1="6" x2="18" y2="18" />
+          <line v-if="mobileOpen" x1="18" y1="6" x2="6" y2="18" />
+          <line v-if="mobileOpen" x1="6" y1="6" x2="18" y2="18" />
         </svg>
       </button>
-
     </div>
 
     <!-- Mobile menu -->
     <Transition name="mobile-menu">
       <div v-if="mobileOpen" class="navbar-mobile-menu">
-
         <template v-if="!auth.isAdmin">
-          <router-link :to="{ name: 'browse' }"        class="mobile-nav-link" @click="mobileOpen = false">Browse</router-link>
-          <router-link :to="{ name: 'my-listings' }"   class="mobile-nav-link" @click="mobileOpen = false">My Listings</router-link>
-          <router-link :to="{ name: 'sent-requests' }" class="mobile-nav-link" @click="mobileOpen = false">Requests</router-link>
-          <router-link :to="{ name: 'transactions' }"  class="mobile-nav-link" @click="mobileOpen = false">Transactions</router-link>
-          <router-link :to="{ name: 'create-listing' }" class="mobile-nav-link mobile-nav-accent" @click="mobileOpen = false">+ List Item</router-link>
+          <router-link :to="{ name: 'browse' }" class="mobile-nav-link" @click="mobileOpen = false"
+            >Browse</router-link
+          >
+          <router-link
+            :to="{ name: 'my-listings' }"
+            class="mobile-nav-link"
+            @click="mobileOpen = false"
+            >My Listings</router-link
+          >
+          <router-link
+            :to="{ name: 'my-reviews' }"
+            class="mobile-nav-link"
+            @click="mobileOpen = false"
+            >My Reviews</router-link
+          >
+          <router-link
+            :to="{ name: 'requests' }"
+            class="mobile-nav-link"
+            @click="mobileOpen = false"
+            >Requests</router-link
+          >
+          <router-link
+            :to="{ name: 'transactions' }"
+            class="mobile-nav-link"
+            @click="mobileOpen = false"
+            >Transactions</router-link
+          >
+          <router-link
+            :to="{ name: 'create-listing' }"
+            class="mobile-nav-link mobile-nav-accent"
+            @click="mobileOpen = false"
+            >+ List Item</router-link
+          >
         </template>
 
         <template v-else>
-          <router-link :to="{ name: 'admin-verifications' }" class="mobile-nav-link" @click="mobileOpen = false">Verifications</router-link>
-          <router-link :to="{ name: 'admin-users' }"         class="mobile-nav-link" @click="mobileOpen = false">Users</router-link>
-          <router-link :to="{ name: 'admin-listings' }"      class="mobile-nav-link" @click="mobileOpen = false">Listings</router-link>
-          <router-link :to="{ name: 'admin-disputes' }"      class="mobile-nav-link" @click="mobileOpen = false">Disputes</router-link>
-          <router-link :to="{ name: 'admin-reports' }"       class="mobile-nav-link" @click="mobileOpen = false">Reports</router-link>
+          <router-link
+            :to="{ name: 'admin-verifications' }"
+            class="mobile-nav-link"
+            @click="mobileOpen = false"
+            >Verifications</router-link
+          >
+          <router-link
+            :to="{ name: 'admin-users' }"
+            class="mobile-nav-link"
+            @click="mobileOpen = false"
+            >Users</router-link
+          >
+          <router-link
+            :to="{ name: 'admin-listings' }"
+            class="mobile-nav-link"
+            @click="mobileOpen = false"
+            >Listings</router-link
+          >
+          <router-link
+            :to="{ name: 'admin-disputes' }"
+            class="mobile-nav-link"
+            @click="mobileOpen = false"
+            >Disputes</router-link
+          >
+          <router-link
+            :to="{ name: 'admin-reports' }"
+            class="mobile-nav-link"
+            @click="mobileOpen = false"
+            >Reports</router-link
+          >
         </template>
-
       </div>
     </Transition>
-
   </header>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/useAuthStore'
 import Button from '@/components/ui/Button.vue'
 import NotificationDropdown from '@/components/NotificationDropdown.vue'
 import ProfileMenu from '@/components/ProfileMenu.vue'
 
-const auth       = useAuthStore()
+const auth = useAuthStore()
+const route = useRoute()
 const mobileOpen = ref(false)
+
+watch(
+  () => route.fullPath,
+  () => {
+    mobileOpen.value = false
+  },
+)
 </script>
 
 <style scoped>
@@ -229,8 +294,14 @@ const mobileOpen = ref(false)
 }
 
 @media (max-width: 768px) {
-  .navbar-links { display: none; }
-  .navbar-actions .btn { display: none; }
-  .navbar-mobile-toggle { display: flex; }
+  .navbar-links {
+    display: none;
+  }
+  .navbar-actions .btn {
+    display: none;
+  }
+  .navbar-mobile-toggle {
+    display: flex;
+  }
 }
 </style>

@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/plugins/axios'
 import { API, STORAGE_KEYS } from '@/utils/constants'
+import { useNotificationStore } from '@/stores/useNotificationStore'
 
 // ============================================================
 // Agora — Auth Store
@@ -11,17 +12,16 @@ import { API, STORAGE_KEYS } from '@/utils/constants'
 // ============================================================
 
 export const useAuthStore = defineStore('auth', () => {
-
   const router = useRouter()
 
   // ----------------------------------------------------------
   // State
   // ----------------------------------------------------------
 
-  const user  = ref(JSON.parse(localStorage.getItem(STORAGE_KEYS.USER)) ?? null)
+  const user = ref(JSON.parse(localStorage.getItem(STORAGE_KEYS.USER)) ?? null)
   const token = ref(localStorage.getItem(STORAGE_KEYS.TOKEN) ?? null)
   const loading = ref(false)
-  const errors  = ref({})
+  const errors = ref({})
 
   // ----------------------------------------------------------
   // Computed — used by router guards
@@ -31,9 +31,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAdmin = computed(() => user.value?.role === 'admin')
 
-  const isVerified = computed(() => {
-    return user.value?.profile?.verification_status === 'approved'
-  })
+  const isVerified = computed(() => user.value?.profile?.verification_status === 'approved')
 
   const isStudent = computed(() => user.value?.role === 'student')
 
@@ -45,16 +43,38 @@ export const useAuthStore = defineStore('auth', () => {
   // Helpers
   // ----------------------------------------------------------
 
+  const getDefaultRedirectName = () => {
+    if (isAdmin.value) return 'admin-dashboard'
+    if (isVerified.value) return 'dashboard'
+    return 'pending-verification'
+  }
+
+  const syncNotifications = () => {
+    const notificationStore = useNotificationStore()
+
+    if (isLoggedIn.value && !isAdmin.value) {
+      notificationStore.startPolling()
+      return
+    }
+
+    notificationStore.stopPolling()
+  }
+
   const setSession = (userData, tokenValue) => {
-    user.value  = userData
+    user.value = userData
     token.value = tokenValue
-    localStorage.setItem(STORAGE_KEYS.USER,  JSON.stringify(userData))
+    localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userData))
     localStorage.setItem(STORAGE_KEYS.TOKEN, tokenValue)
+    syncNotifications()
   }
 
   const clearSession = () => {
-    user.value  = null
+    const notificationStore = useNotificationStore()
+    notificationStore.stopPolling()
+
+    user.value = null
     token.value = null
+    errors.value = {}
     localStorage.removeItem(STORAGE_KEYS.USER)
     localStorage.removeItem(STORAGE_KEYS.TOKEN)
   }
@@ -74,10 +94,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const { data } = await api.post(API.AUTH.REGISTER, payload)
       setSession(data.user, data.token)
-
-      // New student — no profile yet, go create one
-      await router.push({ name: 'pending-verification' })
-
+      await router.replace({ name: 'pending-verification' })
     } catch (error) {
       if (error.response?.status === 422) {
         errors.value = error.response.data.errors ?? {}
@@ -95,20 +112,11 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const { data } = await api.post(API.AUTH.LOGIN, payload)
       setSession(data.user, data.token)
-
-      // Redirect based on role and verification status
-      if (data.user.role === 'admin') {
-        await router.push({ name: 'admin-dashboard' })
-        return
-      }
-
-      if (data.user.profile?.verification_status === 'approved') {
-        await router.push({ name: 'dashboard' })
-        return
-      }
-
-      await router.push({ name: 'pending-verification' })
-
+      
+      // Fetch profile to ensure isVerified is accurate before redirecting
+      await refreshUser()
+      
+      await router.replace({ name: getDefaultRedirectName() })
     } catch (error) {
       if (error.response?.status === 422) {
         errors.value = error.response.data.errors ?? {}
@@ -125,11 +133,11 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       await api.post(API.AUTH.LOGOUT)
     } catch {
-      // Even if the API call fails, clear the session locally
+      // Even if the API call fails, clear the session locally.
     } finally {
       clearSession()
       loading.value = false
-      await router.push({ name: 'login' })
+      await router.replace({ name: 'login' })
     }
   }
 
@@ -141,6 +149,7 @@ export const useAuthStore = defineStore('auth', () => {
   const updateUser = (updatedUser) => {
     user.value = updatedUser
     localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(updatedUser))
+    syncNotifications()
   }
 
   /**
@@ -148,21 +157,52 @@ export const useAuthStore = defineStore('auth', () => {
    * Called on app mount to ensure stored user is still valid.
    */
   const refreshUser = async () => {
-    if (!token.value) return
+    if (!token.value || !user.value) {
+      syncNotifications()
+      return
+    }
+
+    if (isAdmin.value) {
+      syncNotifications()
+      return
+    }
 
     try {
       const { data } = await api.get(API.PROFILE.SHOW)
+      const profile = data?.profile ?? data ?? null
 
-      // Merge fresh profile into stored user
-      user.value = { ...user.value, profile: data }
+      user.value = { ...user.value, profile }
       localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user.value))
-
+      syncNotifications()
     } catch (error) {
-      // 401 handled by axios interceptor — clears session and redirects
-      if (error.response?.status !== 401) {
-        console.warn('[AuthStore] Could not refresh user profile.')
+      if (error.response?.status === 401) {
+        clearSession()
+        await router.replace({ name: 'login' })
+        return
       }
+
+      if (error.response?.status === 404) {
+        user.value = { ...user.value, profile: null }
+        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user.value))
+        syncNotifications()
+        return
+      }
+
+      if (error.response?.status !== 403) {
+        console.warn('[AuthStore] Could not refresh user profile.', error)
+      }
+
+      syncNotifications()
     }
+  }
+
+  const initialize = async () => {
+    if (!token.value) {
+      syncNotifications()
+      return
+    }
+
+    await refreshUser()
   }
 
   // ----------------------------------------------------------
@@ -190,7 +230,7 @@ export const useAuthStore = defineStore('auth', () => {
     logout,
     updateUser,
     refreshUser,
+    initialize,
     clearErrors,
   }
-
 })

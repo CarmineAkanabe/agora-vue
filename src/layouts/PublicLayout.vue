@@ -1,6 +1,7 @@
 <template>
   <div class="public-layout">
-    <PublicNavbar />
+    <AuthNavbar v-if="auth.isLoggedIn" />
+    <PublicNavbar v-else />
 
     <main class="public-main">
       <router-view />
@@ -11,8 +12,12 @@
 </template>
 
 <script setup>
+import { useAuthStore } from '@/stores/useAuthStore'
+import AuthNavbar from '@/components/AuthNavbar.vue'
 import PublicNavbar from '@/components/PublicNavbar.vue'
 import Footer from '@/components/Footer.vue'
+
+const auth = useAuthStore()
 </script>
 
 <style scoped>

@@ -1,6 +1,6 @@
 <template>
   <div class="auth-layout">
-    <AuthNavbar />
+    <AuthNavbar v-if="route.name !== 'pending-verification'" />
 
     <main class="auth-main">
       <div class="container">
@@ -11,7 +11,10 @@
 </template>
 
 <script setup>
+import { useRoute } from 'vue-router'
 import AuthNavbar from '@/components/AuthNavbar.vue'
+
+const route = useRoute()
 </script>
 
 <style scoped>

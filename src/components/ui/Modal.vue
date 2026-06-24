@@ -57,7 +57,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 
 // ============================================================
 // Modal.vue
@@ -98,6 +98,20 @@ const confirmClass = computed(() => {
     form:    'btn-primary',
   }
   return map[props.variant] ?? 'btn-primary'
+})
+
+const handleKeydown = (e) => {
+  if (e.key === 'Escape' && props.modelValue) {
+    close()
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleKeydown)
 })
 </script>
 

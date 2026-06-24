@@ -50,6 +50,11 @@ const router = createRouter({
           component: () => import('@/pages/public/SellerProfile.vue'),
           props: true,
         },
+        {
+          path: 'error',
+          name: 'error',
+          component: () => import('@/pages/public/ErrorPage.vue'),
+        },
       ],
     },
 
@@ -124,14 +129,9 @@ const router = createRouter({
           props: true,
         },
         {
-          path: 'requests/sent',
-          name: 'sent-requests',
-          component: () => import('@/pages/student/SentRequests.vue'),
-        },
-        {
-          path: 'requests/received',
-          name: 'received-requests',
-          component: () => import('@/pages/student/ReceivedRequests.vue'),
+          path: 'requests',
+          name: 'requests',
+          component: () => import('@/pages/student/Requests.vue'),
         },
         {
           path: 'requests/:id',
@@ -151,6 +151,17 @@ const router = createRouter({
           props: true,
         },
         {
+          path: 'disputes',
+          name: 'disputes',
+          component: () => import('@/pages/student/Disputes.vue'),
+        },
+        {
+          path: 'disputes/:id',
+          name: 'dispute-detail',
+          component: () => import('@/pages/student/DisputeDetail.vue'),
+          props: true,
+        },
+        {
           path: 'notifications',
           name: 'notifications',
           component: () => import('@/pages/student/Notifications.vue'),
@@ -159,6 +170,11 @@ const router = createRouter({
           path: 'profile',
           name: 'profile',
           component: () => import('@/pages/student/MyProfile.vue'),
+        },
+        {
+          path: 'reviews',
+          name: 'my-reviews',
+          component: () => import('@/pages/student/MyReviews.vue'),
         },
       ],
     },
@@ -220,9 +236,9 @@ const router = createRouter({
           props: true,
         },
         {
-          path: 'reports',
-          name: 'admin-reports',
-          component: () => import('@/pages/admin/Reports.vue'),
+          path: 'categories',
+          name: 'admin-categories',
+          component: () => import('@/pages/admin/Categories.vue'),
         },
       ],
     },

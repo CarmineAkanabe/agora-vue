@@ -117,9 +117,9 @@ export const useListingStore = defineStore('listing', () => {
     myListings.value = []
 
     try {
-      const { data } = await api.get(API.LISTINGS.INDEX, {
-        params: { 'filter[mine]': true }
-      })
+      const { useAuthStore } = await import('@/stores/useAuthStore')
+      const auth = useAuthStore()
+      const { data } = await api.get(API.LISTINGS.SELLER(auth.user.id))
       myListings.value = data.data ?? data
     } catch (error) {
       console.error('[ListingStore] fetchMyListings:', error)

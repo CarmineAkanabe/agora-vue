@@ -1,7 +1,6 @@
 <template>
   <header class="public-navbar">
     <div class="container navbar-inner">
-
       <!-- Logo -->
       <router-link :to="{ name: 'home' }" class="navbar-logo">
         <span class="logo-text">Agora</span>
@@ -10,26 +9,16 @@
       <!-- Desktop nav links -->
       <nav class="navbar-links">
         <router-link :to="{ name: 'browse' }" class="nav-link">Browse</router-link>
-        <router-link :to="{ name: 'about' }"  class="nav-link">About</router-link>
+        <router-link :to="{ name: 'about' }" class="nav-link">About</router-link>
       </nav>
 
       <!-- Actions -->
       <div class="navbar-actions">
-        <Button
-          v-if="!auth.isLoggedIn"
-          variant="ghost"
-          size="sm"
-          :to="{ name: 'login' }"
-        >
+        <Button v-if="!auth.isLoggedIn" variant="ghost" size="sm" :to="{ name: 'login' }">
           Login
         </Button>
 
-        <Button
-          v-if="!auth.isLoggedIn"
-          variant="primary"
-          size="sm"
-          :to="{ name: 'register' }"
-        >
+        <Button v-if="!auth.isLoggedIn" variant="primary" size="sm" :to="{ name: 'register' }">
           Get Started
         </Button>
 
@@ -45,25 +34,47 @@
 
       <!-- Mobile menu toggle -->
       <button class="navbar-mobile-toggle" @click="mobileOpen = !mobileOpen">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line v-if="!mobileOpen" x1="3" y1="6"  x2="21" y2="6"  />
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <line v-if="!mobileOpen" x1="3" y1="6" x2="21" y2="6" />
           <line v-if="!mobileOpen" x1="3" y1="12" x2="21" y2="12" />
           <line v-if="!mobileOpen" x1="3" y1="18" x2="21" y2="18" />
-          <line v-if="mobileOpen"  x1="18" y1="6" x2="6" y2="18"  />
-          <line v-if="mobileOpen"  x1="6"  y1="6" x2="18" y2="18" />
+          <line v-if="mobileOpen" x1="18" y1="6" x2="6" y2="18" />
+          <line v-if="mobileOpen" x1="6" y1="6" x2="18" y2="18" />
         </svg>
       </button>
-
     </div>
 
     <!-- Mobile menu -->
     <Transition name="mobile-menu">
       <div v-if="mobileOpen" class="navbar-mobile-menu">
-        <router-link :to="{ name: 'browse' }" class="mobile-nav-link" @click="mobileOpen = false">Browse</router-link>
-        <router-link :to="{ name: 'about' }"  class="mobile-nav-link" @click="mobileOpen = false">About</router-link>
+        <router-link :to="{ name: 'browse' }" class="mobile-nav-link" @click="mobileOpen = false"
+          >Browse</router-link
+        >
+        <router-link :to="{ name: 'about' }" class="mobile-nav-link" @click="mobileOpen = false"
+          >About</router-link
+        >
         <div class="mobile-nav-divider" />
-        <router-link v-if="!auth.isLoggedIn" :to="{ name: 'login' }"    class="mobile-nav-link" @click="mobileOpen = false">Login</router-link>
-        <router-link v-if="!auth.isLoggedIn" :to="{ name: 'register' }" class="mobile-nav-link" @click="mobileOpen = false">Get Started</router-link>
+        <router-link
+          v-if="!auth.isLoggedIn"
+          :to="{ name: 'login' }"
+          class="mobile-nav-link"
+          @click="mobileOpen = false"
+          >Login</router-link
+        >
+        <router-link
+          v-if="!auth.isLoggedIn"
+          :to="{ name: 'register' }"
+          class="mobile-nav-link"
+          @click="mobileOpen = false"
+          >Get Started</router-link
+        >
         <router-link
           v-else
           :to="auth.isAdmin ? { name: 'admin-dashboard' } : { name: 'dashboard' }"
@@ -74,17 +85,25 @@
         </router-link>
       </div>
     </Transition>
-
   </header>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/useAuthStore'
 import Button from '@/components/ui/Button.vue'
 
 const auth = useAuthStore()
+const route = useRoute()
 const mobileOpen = ref(false)
+
+watch(
+  () => route.fullPath,
+  () => {
+    mobileOpen.value = false
+  },
+)
 </script>
 
 <style scoped>

@@ -1,9 +1,15 @@
 <template>
-  <div class="notif-wrapper" ref="wrapperRef">
-
+  <div v-if="auth.isLoggedIn" class="notif-wrapper" ref="wrapperRef">
     <!-- Bell button -->
     <button class="notif-trigger" @click="toggleOpen">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
         <path d="M13.73 21a2 2 0 0 1-3.46 0" />
       </svg>
@@ -15,7 +21,6 @@
     <!-- Dropdown -->
     <Transition name="dropdown">
       <div v-if="open" class="notif-dropdown">
-
         <!-- Header -->
         <div class="notif-header">
           <span class="notif-header-title">Notifications</span>
@@ -42,7 +47,15 @@
 
           <template v-else-if="notifStore.notifications.length === 0">
             <div class="notif-empty">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3">
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                opacity="0.3"
+              >
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
                 <path d="M13.73 21a2 2 0 0 1-3.46 0" />
               </svg>
@@ -55,6 +68,7 @@
               v-for="notif in notifStore.notifications.slice(0, 10)"
               :key="notif.id"
               :notification="notif"
+              :read="!!notif.read_at"
               @read="notifStore.markAsRead(notif.id)"
               @delete="notifStore.destroy(notif.id)"
             />
@@ -63,31 +77,34 @@
 
         <!-- Footer -->
         <div class="notif-footer">
-          <router-link
-            :to="{ name: 'notifications' }"
-            class="notif-view-all"
-            @click="open = false"
-          >
+          <router-link :to="{ name: 'notifications' }" class="notif-view-all" @click="open = false">
             View all notifications
           </router-link>
         </div>
-
       </div>
     </Transition>
-
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useAuthStore } from '@/stores/useAuthStore'
 import { useNotificationStore } from '@/stores/useNotificationStore'
 import NotificationItem from '@/components/notifications/NotificationItem.vue'
 
+const auth = useAuthStore()
 const notifStore = useNotificationStore()
-const open       = ref(false)
+const open = ref(false)
 const wrapperRef = ref(null)
 
-const toggleOpen = () => { open.value = !open.value }
+const toggleOpen = async () => {
+  if (!auth.isLoggedIn) return
+
+  open.value = !open.value
+  if (open.value) {
+    await notifStore.fetchNotifications()
+  }
+}
 
 // Close on outside click
 const handleOutsideClick = (e) => {
@@ -96,8 +113,21 @@ const handleOutsideClick = (e) => {
   }
 }
 
-onMounted(() => document.addEventListener('click', handleOutsideClick))
-onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
+const handleKeydown = (e) => {
+  if (e.key === 'Escape' && open.value) {
+    open.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleOutsideClick)
+  document.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleOutsideClick)
+  document.removeEventListener('keydown', handleKeydown)
+})
 </script>
 
 <style scoped>

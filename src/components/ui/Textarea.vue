@@ -1,6 +1,5 @@
 <template>
   <div class="input-wrapper">
-
     <label v-if="label" :for="textareaId" class="label">
       {{ label }}
       <span v-if="required" class="input-required">*</span>
@@ -20,30 +19,30 @@
 
     <span v-if="error" class="error-message">{{ error }}</span>
     <span v-else-if="hint" class="input-hint">{{ hint }}</span>
-
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, useId } from 'vue'
 
 defineOptions({ inheritAttrs: false })
 
 const props = defineProps({
-  modelValue:  { type: String, default: '' },
-  label:       { type: String, default: null },
+  modelValue: { type: String, default: '' },
+  label: { type: String, default: null },
   placeholder: { type: String, default: '' },
-  error:       { type: String, default: null },
-  hint:        { type: String, default: null },
-  disabled:    { type: Boolean, default: false },
-  required:    { type: Boolean, default: false },
-  rows:        { type: Number, default: 4 },
-  id:          { type: String, default: null },
+  error: { type: String, default: null },
+  hint: { type: String, default: null },
+  disabled: { type: Boolean, default: false },
+  required: { type: Boolean, default: false },
+  rows: { type: Number, default: 4 },
+  id: { type: String, default: null },
 })
 
 defineEmits(['update:modelValue', 'blur'])
 
-const textareaId = computed(() => props.id ?? `textarea-${Math.random().toString(36).slice(2, 7)}`)
+const generatedId = useId()
+const textareaId = computed(() => props.id ?? generatedId)
 </script>
 
 <style scoped>

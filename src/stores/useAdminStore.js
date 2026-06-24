@@ -50,7 +50,7 @@ export const useAdminStore = defineStore('admin', () => {
 
     try {
       const { data } = await api.get(API.ADMIN.VERIFICATIONS.INDEX)
-      verifications.value = data
+      verifications.value = data.data ?? data
     } catch (error) {
       console.error('[AdminStore] fetchVerifications:', error)
     } finally {
@@ -64,7 +64,7 @@ export const useAdminStore = defineStore('admin', () => {
 
     try {
       const { data } = await api.get(API.ADMIN.VERIFICATIONS.SHOW(id))
-      verification.value = data
+      verification.value = data.data ?? data
     } catch (error) {
       console.error('[AdminStore] fetchVerification:', error)
     } finally {
@@ -109,7 +109,7 @@ export const useAdminStore = defineStore('admin', () => {
 
     try {
       const { data } = await api.get(API.ADMIN.USERS.INDEX)
-      users.value = data
+      users.value = data.data ?? data
     } catch (error) {
       console.error('[AdminStore] fetchUsers:', error)
     } finally {
@@ -123,7 +123,7 @@ export const useAdminStore = defineStore('admin', () => {
 
     try {
       const { data } = await api.get(API.ADMIN.USERS.SHOW(id))
-      user.value = data
+      user.value = data.data ?? data
     } catch (error) {
       console.error('[AdminStore] fetchUser:', error)
     } finally {
@@ -147,16 +147,32 @@ export const useAdminStore = defineStore('admin', () => {
     }
   }
 
-  const unbanUser = async (id) => {
+  const unbanUser = async (userId) => {
     loading.value = true
 
     try {
-      await api.post(API.ADMIN.USERS.UNBAN(id))
-      const u = users.value.find((u) => u.id === id)
+      await api.post(API.ADMIN.USERS.UNBAN(userId))
+      const u = users.value.find((u) => u.id === userId)
       if (u) u.is_banned = false
-      if (user.value?.id === id) user.value.is_banned = false
+      if (user.value && user.value.id === userId) {
+        user.value.is_banned = false
+      }
     } catch (error) {
       console.error('[AdminStore] unbanUser:', error)
+      throw error
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const deleteUser = async (userId) => {
+    loading.value = true
+    try {
+      await api.delete(API.ADMIN.USERS.DESTROY(userId))
+      users.value = users.value.filter((u) => u.id !== userId)
+      if (user.value?.id === userId) user.value = null
+    } catch (error) {
+      console.error('[AdminStore] deleteUser:', error)
       throw error
     } finally {
       loading.value = false
@@ -268,6 +284,7 @@ export const useAdminStore = defineStore('admin', () => {
 
     try {
       const { data } = await api.get(API.ADMIN.REPORTS.OVERVIEW)
+      console.log('[AdminStore] fetchOverview payload:', data)
       overview.value = data
     } catch (error) {
       console.error('[AdminStore] fetchOverview:', error)
@@ -281,6 +298,7 @@ export const useAdminStore = defineStore('admin', () => {
 
     try {
       const { data } = await api.get(API.ADMIN.REPORTS.TRANSACTIONS)
+      console.log('[AdminStore] fetchTransactionReport payload:', data)
       txReport.value = data
     } catch (error) {
       console.error('[AdminStore] fetchTransactionReport:', error)
@@ -294,6 +312,7 @@ export const useAdminStore = defineStore('admin', () => {
 
     try {
       const { data } = await api.get(API.ADMIN.REPORTS.LISTINGS)
+      console.log('[AdminStore] fetchListingReport payload:', data)
       listingReport.value = data
     } catch (error) {
       console.error('[AdminStore] fetchListingReport:', error)
@@ -307,6 +326,7 @@ export const useAdminStore = defineStore('admin', () => {
 
     try {
       const { data } = await api.get(API.ADMIN.REPORTS.USERS)
+      console.log('[AdminStore] fetchUserReport payload:', data)
       userReport.value = data
     } catch (error) {
       console.error('[AdminStore] fetchUserReport:', error)
@@ -347,7 +367,7 @@ export const useAdminStore = defineStore('admin', () => {
     approveVerification, rejectVerification,
 
     // Users
-    fetchUsers, fetchUser, banUser, unbanUser,
+    fetchUsers, fetchUser, banUser, unbanUser, deleteUser,
 
     // Listings
     fetchListings, removeListing,

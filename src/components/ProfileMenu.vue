@@ -45,7 +45,7 @@
           <template v-else>
             <router-link :to="{ name: 'dashboard' }"       class="profile-nav-item" @click="open = false">Dashboard</router-link>
             <router-link :to="{ name: 'my-listings' }"     class="profile-nav-item" @click="open = false">My Listings</router-link>
-            <router-link :to="{ name: 'sent-requests' }"   class="profile-nav-item" @click="open = false">My Requests</router-link>
+            <router-link :to="{ name: 'requests' }"        class="profile-nav-item" @click="open = false">My Requests</router-link>
             <router-link :to="{ name: 'transactions' }"    class="profile-nav-item" @click="open = false">Transactions</router-link>
             <router-link :to="{ name: 'profile' }"         class="profile-nav-item" @click="open = false">My Profile</router-link>
           </template>
@@ -94,8 +94,21 @@ const handleOutsideClick = (e) => {
   }
 }
 
-onMounted(() => document.addEventListener('click', handleOutsideClick))
-onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
+const handleKeydown = (e) => {
+  if (e.key === 'Escape' && open.value) {
+    open.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleOutsideClick)
+  document.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleOutsideClick)
+  document.removeEventListener('keydown', handleKeydown)
+})
 </script>
 
 <style scoped>

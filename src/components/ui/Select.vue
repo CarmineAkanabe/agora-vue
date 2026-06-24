@@ -1,6 +1,5 @@
 <template>
   <div class="input-wrapper">
-
     <label v-if="label" :for="selectId" class="label">
       {{ label }}
       <span v-if="required" class="input-required">*</span>
@@ -11,23 +10,28 @@
         :id="selectId"
         v-bind="$attrs"
         :value="modelValue"
-        :disabled="disabled"
+        :disabled="disabled || options.length === 0"
         :class="['input', 'select', error ? 'input-error' : '']"
         @change="$emit('update:modelValue', $event.target.value)"
       >
-        <option v-if="placeholder" value="" disabled>{{ placeholder }}</option>
-        <option
-          v-for="option in options"
-          :key="option.value"
-          :value="option.value"
-        >
+        <option v-if="placeholder" value="" disabled>
+          {{ options.length === 0 ? 'No options available' : placeholder }}
+        </option>
+        <option v-for="option in options" :key="option.value" :value="option.value">
           {{ option.label }}
         </option>
       </select>
 
       <!-- Chevron icon -->
       <span class="select-chevron">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <polyline points="6 9 12 15 18 9" />
         </svg>
       </span>
@@ -35,30 +39,30 @@
 
     <span v-if="error" class="error-message">{{ error }}</span>
     <span v-else-if="hint" class="input-hint">{{ hint }}</span>
-
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, useId } from 'vue'
 
 defineOptions({ inheritAttrs: false })
 
 const props = defineProps({
-  modelValue:  { type: [String, Number], default: '' },
-  options:     { type: Array, default: () => [] },
-  label:       { type: String, default: null },
+  modelValue: { type: [String, Number], default: '' },
+  options: { type: Array, default: () => [] },
+  label: { type: String, default: null },
   placeholder: { type: String, default: 'Select an option' },
-  error:       { type: String, default: null },
-  hint:        { type: String, default: null },
-  disabled:    { type: Boolean, default: false },
-  required:    { type: Boolean, default: false },
-  id:          { type: String, default: null },
+  error: { type: String, default: null },
+  hint: { type: String, default: null },
+  disabled: { type: Boolean, default: false },
+  required: { type: Boolean, default: false },
+  id: { type: String, default: null },
 })
 
 defineEmits(['update:modelValue'])
 
-const selectId = computed(() => props.id ?? `select-${Math.random().toString(36).slice(2, 7)}`)
+const generatedId = useId()
+const selectId = computed(() => props.id ?? generatedId)
 </script>
 
 <style scoped>

@@ -112,6 +112,7 @@ export const API = {
       SHOW:  (id) => `/admin/users/${id}`,
       BAN:   (id) => `/admin/users/${id}/ban`,
       UNBAN: (id) => `/admin/users/${id}/unban`,
+      DESTROY: (id) => `/admin/users/${id}`,
     },
 
     LISTINGS: {
